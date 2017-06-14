@@ -1,4 +1,8 @@
 
+## How to Run
+
+Have been running httpster, though most any server will do...
+
 ## Construct a new force layout
 
 ```javascript
