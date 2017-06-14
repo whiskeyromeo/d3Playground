@@ -1,0 +1,9 @@
+{
+  "name": "d3-map",
+  "private": "true",
+  "version": "0.0.1",
+  "dependencies": {
+    "colorbrewer": "^1.0.0",
+    "topojson": "1"
+  }
+}

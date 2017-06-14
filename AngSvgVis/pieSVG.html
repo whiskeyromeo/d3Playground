@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>
+		Angular SVG pie widget
+	</title>
+	<script src="https://code.angularjs.org/1.4.2/angular.min.js"></script>
+	<script>
+		var dashboard = angular.module('Dashboard', [])
+		dashboard.controller('pieController', function($scope) {
+			$scope.specs = {
+				slices: [
+					{value: 50, color: '#A62E5C', label: { text: "North", adjustment: 0}},
+					{value: 100, color: '#9BC850', label: { text: "South", adjustment: 0}},
+					{value: 75, color: '#F15B2A', label: { text: "East", adjustment: 15}},
+					{value: 13, color: '#D25B2A', label: { text: "West", adjustment: 10}},
+					{value: 50, color: '#675BA7', label: { text: "None", adjustment: 0}},]}
+
+			var x1 = 200,
+				y1 = 0,
+				prevEndingAngle = 0
+				total = 0;
+
+			angular.forEach($scope.specs.slices, function(slice, i) {
+				total += parseInt(slice.value);
+			})
+
+			//Generate the slices based on proportion
+			angular.forEach($scope.specs.slices, function(slice, i) {
+				slice.x1 = x1;
+				slice.y1 = y1;
+
+				slice.endingAngle = (slice.value/total * 360) + prevEndingAngle;
+				var radians = slice.endingAngle * (Math.PI/180);
+				slice.x2 = (Math.cos(radians)*200); 
+				slice.y2 = (Math.sin(radians)*200); 
+
+				x1 = slice.x2;
+				y1 = slice.y2
+				prevEndingAngle = slice.endingAngle;
+			});
+
+
+			//Generate the Label Ticks for each slice
+			angular.forEach($scope.specs.slices, function(slice, i) {
+				var angle = i == 0 ? slice.endingAngle / 2 : slice.endingAngle - (slice.endingAngle - prevEndingAngle) / 2;
+
+				var radians = angle * (Math.PI/180);
+				var ticMarkX = Math.cos(radians) * 200;
+				var ticMarkY = Math.sin(radians) * 200;
+
+				slice.label.x = Math.cos(radians) * (200 + 20);
+				slice.label.y = Math.sin(radians) * (200 + 20);
+				slice.label.alignment = getAlignment(angle);
+
+				slice.ticMark = { 
+					x: parseInt(ticMarkX),
+					y: parseInt(ticMarkY),
+					rotation: parseInt(angle)
+				};
+				
+				prevEndingAngle = slice.endingAngle;
+			});
+
+			function getAlignment(s) {
+				if(s < 45 ) return "start";
+				else if( s < 135) return "middle";
+				else if( s < 225 ) return "end";
+				else if( s < 315 ) return "moddle";
+				else return "start";
+			}
+
+		})
+	</script>
+</head>
+<body ng-app="Dashboard">
+	<div ng-controller="pieController">
+		<svg xmln="http://www.w3.org/2000/svg" height="600" width="600">
+			<!-- <path stroke="" fill="" stroke-width="" 
+				d="M [center point x], [center point y] 1 [x offset of 1st point],
+					[y offset of 1st point] a[radius],
+					[radius] 0[0 if < half of pie, 1 if > half of pie] 0 [x offset of 2nd point],
+				[y offset of 2nd point] " /> -->
+				<path ng-repeat="slice in specs.slices" stroke="{{slice.color}}" fill="{{slice.color}}" stroke-width="0" d="M 300,300 l {{slice.x1}},{{slice.y1 * -1}} a200,200 0 0 0 {{slice.x2 -slice.x1}}, {{(slice.y2 -slice.y1) * -1}}" />
+				<line ng-repeat="slice in specs.slices" stroke="black" stroke-width="2"
+				 	x1="{{300 + slice.ticMark.x - 10}}" y1="{{300 + (slice.ticMark.y * -1)}}"
+				 	x2="{{300 + slice.ticMark.x + 10}}" y2="{{300 + slice.ticMark.y * -1}}"
+					transform="rotate({{slice.ticMark.rotation * -1}}, {{300 + slice.ticMark.x}}, {{300 + (slice.ticMark.y * -1)}})"
+				 />
+				 <text ng-repeat="slice in specs.slices"
+				 	 x="{{300 + slice.label.x - slice.label.adjustment}}" 
+				 	 y="{{300 + (slice.label.y - slice.label.adjustment) * -1 }}" 
+				 	 text-anchor="{{slice.label.alignment}}"
+				 	 style="font-family: arial; font-size: 16pt"
+				 >
+				 	{{slice.label.text}}
+				 </text>
+		</svg>
+	</div>
+</body>
+</html>

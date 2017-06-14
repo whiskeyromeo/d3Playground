@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>D3 ForceLayout</title
+</head>
+<style>
+	body {
+		background-color: lightgrey;
+	}
+	.node {
+		fill: #ccc;
+		stroke: #fff;
+		stroke-width: 2px;
+	}
+	path.link {
+		fill: none;
+		stroke: #777;
+		stroke-width: 2px;
+	}
+
+	h1 {
+		padding: 10px;
+	}
+
+</style>
+<body>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+	<script>
+	//Change distance between nodes based on params passed in through URL
+
+
+		var param = document.URL.split("#")[1] || 200;
+
+		var header = d3.select('body').append('h1')
+			.html("linkDistance(" + param + ")")
+			.style("text-align", "center");
+
+
+		//set width and height for svg
+		var width = 640;
+		var height = 480;
+
+		// set up nodes
+		var nodes = [ //Want a flat structure such as the one below
+			{name: 'Alice'},
+			{name: 'Mad Hatter'},
+			{name: 'Caterpillar'}
+		];
+
+		var links = [
+			{source:0, target:1},
+			{source:1, target:2},
+			{source:2, target:0},
+		]
+
+		// mount the svg to the body
+		var svg = d3.select('body').append('svg')
+			.attr('width', width)
+			.attr('height', height)
+
+		var link = svg.selectAll('.link')
+			.data(links)
+			.enter().append('line')
+			.attr('class', 'link');
+
+		// for each node, draw an svg
+		var node = svg.selectAll('.node')
+			.data(nodes)
+			.enter()
+			.append('circle')
+			.attr('class', 'node')
+			.attr('cx', function(d,i) { return (i+1) * (width/4); })
+			.attr('cy', function(d,i) { return height/2; })
+			.attr('r', width * 0.05);
+
+		//Must be after the node, otherwise would be under the nodes
+		var path = svg.append("svg:g").selectAll("path")
+			.data(links)
+			.enter().append("svg:path")
+			.attr("class", "link");
+
+		//enable the force layout graph
+		var force = d3.layout.force()
+			.size([width, height])
+			.nodes(nodes)
+			.links(links)
+			.on('tick', tick)
+			.linkDistance(param)
+			.start();
+
+		function tick() {
+			node.attr('cx', function(d) { return d.x; })
+				.attr('cy', function(d) { return d.y; })
+				.call(force.drag);
+
+			path.attr('d', function(d, i) { 
+				var dx = d.target.x - d.source.x,
+					dy = d.target.y - d.source.y,
+					dr = Math.sqrt(dx*dx + dy*dy);
+
+				//Return the Barnes Algorithm for drawing the arc
+				return "M" + 
+					d.source.x + "," + d.source.y + 
+					"A" + dr + "," + dr + " 0 0,1 " + 
+					d.target.x + "," + d.target.y
+			});
+				
+		};
+
+
+	</script>
+</body>
+</html>

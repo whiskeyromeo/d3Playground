@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>D3 ForceLayout</title
+</head>
+<style>
+	body {
+		background-color: lightgrey;
+	}
+	.node {
+		fill: #ccc;
+		stroke: #fff;
+		stroke-width: 2px;
+	}
+</style>
+<body>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+	<script>
+	// ADDING NODES
+
+		//set width and height for svg
+		var width = 640;
+		var height = 480;
+
+		// set up nodes
+		var nodes = [ //Want a flat structure such as the one below
+			{name: 'Alice'},
+			{name: 'Mad Hatter'},
+			{name: 'Caterpillar'}
+		];
+
+		// mount the svg to the body
+		var svg = d3.select('body').append('svg')
+			.attr('width', width)
+			.attr('height', height)
+
+		// for each node, draw an svg
+		var node = svg.selectAll('.node')
+			.data(nodes)
+			.enter()
+			.append('circle')
+			.attr('class', 'node')
+			.attr('cx', function(d,i) { return (i+1) * (width/4); })
+			.attr('cy', function(d,i) { return height/2; })
+			.attr('r', width * 0.05)
+
+		//enable the force layout graph
+		var force = d3.layout.force()
+			.size([width, height])
+			.nodes(nodes)
+			.start();
+
+
+	</script>
+</body>
+</html>

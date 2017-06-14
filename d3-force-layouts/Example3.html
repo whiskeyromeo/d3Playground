@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>D3 ForceLayout</title
+</head>
+<style>
+	body {
+		background-color: lightgrey;
+	}
+	.node {
+		fill: #ccc;
+		stroke: #fff;
+		stroke-width: 2px;
+	}
+	.link {
+		stroke: #777;
+		stroke-width: 2px;
+	}
+</style>
+<body>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+	<script>
+	// ADDING LINKS BETWEEN NODES
+
+		//set width and height for svg
+		var width = 640;
+		var height = 480;
+
+		// set up nodes
+		var nodes = [ //Want a flat structure such as the one below
+			{name: 'Alice'},
+			{name: 'Mad Hatter'},
+			{name: 'Caterpillar'}
+		];
+
+		var links = [
+			{source:0, target:1},
+			{source:1, target:2},
+			{source:2, target:0},
+		]
+
+		// mount the svg to the body
+		var svg = d3.select('body').append('svg')
+			.attr('width', width)
+			.attr('height', height)
+
+		var link = svg.selectAll('.link')
+			.data(links)
+			.enter().append('line')
+			.attr('class', 'link');
+
+		// for each node, draw an svg
+		var node = svg.selectAll('.node')
+			.data(nodes)
+			.enter()
+			.append('circle')
+			.attr('class', 'node')
+			.attr('cx', function(d,i) { return (i+1) * (width/4); })
+			.attr('cy', function(d,i) { return height/2; })
+			.attr('r', width * 0.05)
+
+		function tick() {
+			node.attr('cx', function(d) { return d.x; })
+				.attr('cy', function(d) { return d.y; })
+				.call(force.drag);
+
+			link.attr('x1', function(d) { return d.source.x; })
+				.attr('y1', function(d) { return d.source.y; })
+				.attr('x2', function(d) { return d.target.x; })
+				.attr('y2', function(d) { return d.target.y; })
+		};
+
+		//enable the force layout graph
+		var force = d3.layout.force()
+			.size([width, height])
+			.nodes(nodes)
+			.links(links)
+			.on('tick', tick)
+			.linkDistance(width/2)
+			.start();
+
+
+	</script>
+</body>
+</html>

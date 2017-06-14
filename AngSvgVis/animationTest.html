@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Anigmation tester</title>
+	<script src="https://code.angularjs.org/1.4.2/angular.min.js"></script>
+	<script>
+		var animation = angular.module('animation', [])
+		
+		animation.controller('animationController', function($scope) {
+			$scope.barStyle = 'animation: barAnimation .5s linear; animation-fill-mode: forwards;'
+
+			var animationDefinition = '@keyframes barAnimation { from {width: 0px; } to { width: 200px; }}';
+			document.styleSheets[0].insertRule(animationDefinition,0);
+		});
+
+	</script>
+<style>
+	
+	.bar {
+		fill: #A62E5C;
+		width: 250px;
+		height: 250px;
+	}
+
+</style>
+</head>
+<body ng-app="animation">
+	<div ng-controller="animationController">
+		<svg xmlns="http://www.w3.org/2000/svg" width="250" height="250">
+			<rect style="{{barStyle}}" class="bar" x="20" y="10"></rect>
+		</svg>
+	</div>
+</body>
+</html>

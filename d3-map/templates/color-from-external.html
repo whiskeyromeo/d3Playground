@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Geospatial mapping with D3</title>
+	<style>
+		/** CSS in here **/
+		.land {
+			fill: #e5e5e5;
+			stroke: #666;
+			stroke-linejoin: round;
+			stroke-linecap: round;
+		}
+
+		.border {
+			fill: none;
+			stroke: #666;
+		}
+
+		.county {
+			stroke: #999;
+			stroke-width: .5;
+		}
+
+		.counties {
+			fill: none;
+		}
+
+		.states {
+			fill: none;
+			stroke: #fff;
+			stroke-linejoin: round;
+		}
+	</style>
+</head>
+<body>
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<script src="http://d3js.org/topojson.v1.min.js"></script>
+	<script src="http://d3js.org/queue.v1.min.js"></script>
+	<script src="../node_modules/colorbrewer/colorbrewer.js"></script>
+	<script>
+		//set the dimensions
+		var width = 960;
+		var height = 600;
+
+		//out topojson already has a projection
+		var path = d3.geo.path()
+			.projection(null);
+
+		var radius = d3.scale.sqrt()
+			.domain([0, 1e6])
+			.range([0, 15]);
+
+		var svg = d3.select("body").append("svg")
+			.attr("width", width)
+			.attr("height", height);	
+
+		var rateById = d3.map();
+
+		//define color pallette using colorbrewer
+		var color = d3.scale.quantize()
+			.domain([0, .15])
+			.range(colorbrewer.Greens[7]);
+
+		//use queue to load multiple files asynchronously
+		queue()
+			.defer(d3.json, "../us.json")
+			.defer(d3.csv, "../profit-by-county.csv", function(d) {
+				rateById.set(d.id, +d.rate);
+			})
+			.await(ready);
+
+		//Take in us.json
+		function ready(err, us) {
+			if(err) return console.error(err);
+
+			//draw counties
+			svg.append("g")
+					.attr("class", "counties")
+				.selectAll("path")
+					.data(topojson.feature(us, us.objects.counties).features)
+				.enter().append("path")
+					.attr("class", "county")
+					.attr("d", path)
+					//Add the color
+					.attr("fill", function(d) { return color(rateById.get(d.id)); });
+
+
+			//append states overlay
+			svg.append("path")
+				.datum(topojson.mesh(us, us.objects.states, function(a,b) { return a !== b}))
+				.attr("class", "states")
+				.attr("d", path);
+
+		};
+
+		d3.select(self.frameElement).style("height", height + "px");
+
+	</script>
+	
+
+	<h1>Geospatial Mapping with D3</h1>
+	
+</body>
+</html>

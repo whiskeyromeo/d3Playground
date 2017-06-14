@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300">
+	<path 
+		id="background" 
+		ng-attr-d="{{background}}" 
+		stroke-width="10" stroke="black" fill="none"/>
+	<path 
+		ng-attr-d="{{startValue}}" 
+		style="{{dashArray}}"
+		stroke-width="10" stroke="#9BC850" fill="none"/>	
+	<path 
+		id="gradients" 
+		ng-attr-d="{{gradients}}" 
+		stroke-width="0" fill="none"/>
+	<text 
+		ng-repeat="gradient in specs.gradients" 
+		ng-attr-dx="0" 
+		ng-attr-dy="0" 
+		text-anchor="middle" 
+		style="font: bold large arial">
+		<textPath xlink:href="#gradients" startOffset="{{gradient.offset}}%">
+		{{gradient.value}}
+	</text>
+
+	<text 
+		ng-attr-x="{{maxValueCoordinates.x}}" 
+		ng-attr-y="{{maxValueCoordinates.y}}" 
+		text-anchor="middle" 
+		style="font:bold large arial"
+		ng-attr-transform="rotate(90,{{maxValueCoordinates.x}}, {{maxValueCoordinates.y}})">
+		{{specs.maxValue}}
+	</text>
+</svg>

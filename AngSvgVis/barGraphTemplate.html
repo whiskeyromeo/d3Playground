@@ -1,0 +1,33 @@
+<svg xmins="http://www.w3.org/2000/svg" width="150" height="150">
+	<g ng-repeat="bar in specs.bars">
+		<text ng-attr-x="0" 
+			  ng-attr-y="{{(( 1 *specs.height + specs.padding) * $index) + (specs.height/2) + (specs.fontHeight/2)}}"
+			  text-anchor="start"
+			  style="font-family:arial;font-size: 10pt"
+		>{{bar.text}}</text>
+		<rect ng-attr-x="{{specs.labelWidth + 6}}" 
+			  style="{{bar.barStyle}}"
+			  ng-attr-y="{{( 1 *specs.height + specs.padding) * $index}}" 
+			  fill="{{bar.color}}"
+			  ng-attr-width="{{bar.width}}"
+			  ng-attr-height="{{specs.height}}"
+			  >
+		</rect>
+	</g>
+	<line ng-attr-x1="{{specs.labelWidth + specs.labelOffset}}" 
+		  ng-attr-x2="{{specs.labelWidth + specs.labelOffset}}" 
+		  ng-attr-y1="0" 
+		  ng-attr-y2="{{specs.overallHeight}}" 
+		  style="stroke:black; stroke-width:1px" />
+	<line ng-attr-x1="{{specs.labelWidth + specs.labelOffset}}" 
+		  ng-attr-x2="{{specs.overallWidth + specs.labelWidth + specs.labelOffset}}" 
+		  ng-attr-y1="{{specs.overallHeight}}" 
+		  ng-attr-y2="{{specs.overallHeight}}" 
+		  style="stroke:black; stroke-width:1px" />
+	<text ng-repeat="gradient in specs.gradients" 
+		  ng-attr-x="{{specs.labelWidth + gradient.offset + specs.labelOffset}}" 
+		  ng-attr-y="{{((1* specs.height + specs.padding) * specs.bars.length) + specs.fontHeight + 3}}" 
+		  text-anchor="middle" 
+		  style="font-family: arial; font-size: 10px"
+	>{{gradient.text}}</text>
+</svg>

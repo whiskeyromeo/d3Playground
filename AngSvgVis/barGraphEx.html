@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Angular Bar Graph with SVG</title>
+	<script src="https://code.angularjs.org/1.4.2/angular.min.js"></script>
+	<script type="text/javascript">
+		var dashboard = angular.module("Dashboard", [])
+
+		dashboard.controller("BarGraphController", function($scope) {
+			$scope.spec = {
+				height: 30,
+				padding: 5,
+				fontStyle: '10pt arial',
+				fontHeight: 10,
+				gradientInterval: 50,
+				labelOffset: 5,
+				gradients: [],
+				bars : [
+					{ color:"blue", width: 50, text: 'September'},
+					{ color:"orange", width: 60, text: 'October'},
+					{ color:"red", width: 90, text: 'November'}
+				]
+			};
+
+			$scope.$watch('spec', function() {
+
+				var ctx = document.createElement('canvas').getContext('2d');
+				var gradients = [];
+
+				ctx.font = $scope.spec.fontStyle;
+				$scope.spec.labelWidth = 0;
+				$scope.spec.overallWidth = 0;
+
+
+				angular.forEach($scope.spec.bars, function(bar, index) {
+					$scope.spec.labelWidth = Math.max($scope.spec.labelWidth, ctx.measureText(bar.text).width);
+					$scope.spec.overallWidth = Math.max($scope.spec.overallWidth, bar.width);
+				});
+
+				for( var i = 0; ;i+=$scope.spec.gradientInterval) {
+					gradients.push({text:i, offset:i});
+					if( i > $scope.spec.overallWidth)
+						break;
+				}
+				$scope.spec.gradients = gradients;
+
+				$scope.spec.overallHeight = $scope.spec.bars.length * (1 * $scope.spec.height + $scope.spec.padding);
+			}, true);
+		});
+	</script>
+</head>
+<body ng-app="Dashboard">
+	<div ng-controller="BarGraphController">
+		<input type="text" ng-model="spec.height">
+		<p></p>
+		<span>
+			<svg xmins="http://www.w3.org/2000/svg" width="250" height="250">
+				<g ng-repeat="bar in spec.bars">
+					<text x="0" y="{{(( 1 *spec.height + spec.padding) * $index) + (spec.height/2) + (spec.fontHeight/2)}}" text-anchor="start" style="font-family:arial;font-size: 10pt">{{bar.text}}</text>
+					<rect x="{{spec.labelWidth + 6}}" y="{{( 1 *spec.height + spec.padding) * $index}}" fill="{{bar.color}}" width="{{bar.width}}" height="{{spec.height}}">
+					</rect>
+				</g>
+				<line x1="{{spec.labelWidth + spec.labelOffset}}" x2="{{spec.labelWidth + spec.labelOffset}}" y1="0" y2="{{spec.overallHeight}}" style="stroke:black; stroke-width:1px" />
+				<line x1="{{spec.labelWidth + spec.labelOffset}}" x2="{{spec.overallWidth + spec.labelWidth + spec.labelOffset}}" y1="{{spec.overallHeight}}" y2="{{spec.overallHeight}}" style="stroke:black; stroke-width:1px" />
+				<text ng-repeat="gradient in spec.gradients" x="{{spec.labelWidth + gradient.offset + spec.labelOffset}}" y="{{((1* spec.height + spec.padding) * spec.bars.length) + spec.fontHeight + 3}}" text-anchor="middle" style="font-family: arial; font-size: 10px">{{gradient.text}}</text>
+			</svg>
+		</span>
+	</div>
+</body>
+</html>
